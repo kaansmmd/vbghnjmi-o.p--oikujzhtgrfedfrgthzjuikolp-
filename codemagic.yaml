@@ -1,10 +1,10 @@
 workflows:
   ios-ipa-build:
-    name: "iOS ApkRunner IPA + ZIP Build"
+    name: "iOS ApkRunner IPA + ZIP Build (Automatic Signing)"
     max_build_duration: 60
     environment:
       vars:
-        DEVELOPMENT_TEAM: "YOUR_TEAM_ID"   # <- Apple Developer Team ID oder als Secret in Codemagic
+        DEVELOPMENT_TEAM: "YOUR_TEAM_ID"   # <- Apple Team ID oder als Secret in Codemagic
       xcode: latest
       cocoapods: default
     scripts:
@@ -24,7 +24,6 @@ workflows:
                      -configuration Release \
                      -sdk iphoneos \
                      -archivePath "$ARCHIVE_PATH" \
-                     CODE_SIGN_IDENTITY="iPhone Distribution" \
                      CODE_SIGN_STYLE="Automatic" \
                      DEVELOPMENT_TEAM="$DEVELOPMENT_TEAM"
 
