@@ -1,1 +1,54 @@
-null
+workflows:
+  ios-ipa-build:
+    name: "iOS ApkRunner IPA + ZIP Build"
+    max_build_duration: 60
+    environment:
+      vars:
+        DEVELOPMENT_TEAM: "YOUR_TEAM_ID"   # <- Apple Developer Team ID oder als Secret in Codemagic
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Install dependencies
+        script: |
+          echo "Keine zusätzlichen Abhängigkeiten für SwiftUI nötig"
+
+      - name: Archive app
+        script: |
+          set -e
+          BUILD_DIR="$CM_BUILD_DIR/build"
+          ARCHIVE_PATH="$BUILD_DIR/ApkRunner.xcarchive"
+
+          echo "Archiviere App..."
+          xcodebuild -project ApkRunner/ApkRunner.xcodeproj \
+                     -scheme ApkRunner \
+                     -configuration Release \
+                     -sdk iphoneos \
+                     -archivePath "$ARCHIVE_PATH" \
+                     CODE_SIGN_IDENTITY="iPhone Distribution" \
+                     CODE_SIGN_STYLE="Automatic" \
+                     DEVELOPMENT_TEAM="$DEVELOPMENT_TEAM"
+
+      - name: Export IPA
+        script: |
+          BUILD_DIR="$CM_BUILD_DIR/build"
+          ARCHIVE_PATH="$BUILD_DIR/ApkRunner.xcarchive"
+          IPA_PATH="$BUILD_DIR/ApkRunner.ipa"
+
+          echo "Exportiere IPA..."
+          xcodebuild -exportArchive \
+                     -archivePath "$ARCHIVE_PATH" \
+                     -exportOptionsPlist ApkRunner/ExportOptions.plist \
+                     -exportPath "$BUILD_DIR"
+
+          echo "IPA Build fertig: $IPA_PATH"
+
+      - name: Create ZIP
+        script: |
+          BUILD_DIR="$CM_BUILD_DIR/build"
+          cd "$BUILD_DIR"
+          zip -r ApkRunner.zip ApkRunner.ipa
+          echo "ZIP erstellt: $BUILD_DIR/ApkRunner.zip"
+
+    artifacts:
+      - build/ApkRunner.ipa
+      - build/ApkRunner.zip
