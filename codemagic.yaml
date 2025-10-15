@@ -1,6 +1,6 @@
 workflows:
   ios-ipa-build:
-    name: "iOS ApkRunner IPA + ZIP Build (Automatic Signing)"
+    name: "iOS ApkRunner IPA + ZIP Build"
     max_build_duration: 60
     environment:
       vars:
@@ -19,7 +19,8 @@ workflows:
           ARCHIVE_PATH="$BUILD_DIR/ApkRunner.xcarchive"
 
           echo "Archiviere App..."
-          xcodebuild -project ApkRunner/ApkRunner.xcodeproj \
+          # Projekt liegt im Root
+          xcodebuild -project ApkRunner.xcodeproj \
                      -scheme ApkRunner \
                      -configuration Release \
                      -sdk iphoneos \
